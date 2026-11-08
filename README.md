@@ -108,7 +108,7 @@ git clone https://github.com/Huzaifakkhan-dev/codeAlpha-Connectify.git
 ### 2. Open the Project
 
 ```bash
-cd Connectify
+cd codeAlpha-Connectify
 ```
 
 ### 3. Install Backend Dependencies
