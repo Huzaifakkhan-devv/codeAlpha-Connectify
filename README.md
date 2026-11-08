@@ -176,7 +176,7 @@ Multer handles profile avatar and post image uploads. Uploaded files are stored 
 
 **Huzaifa Khan**
 
-GitHub: https://github.com/YOUR-USERNAME
+GitHub: https://github.com/Huzaifakkhan-devv
 
 ## License
 
