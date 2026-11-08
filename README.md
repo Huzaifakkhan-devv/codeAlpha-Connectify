@@ -146,6 +146,30 @@ http://localhost:5000
 
 Open `frontend/index.html` in your browser or use the VS Code Live Server extension.
 
+## API Endpoints
+
+Base URL:
+
+```text
+http://localhost:5000/api
+```
+
+| Module | Endpoint |
+|---|---|
+| Health | GET /health |
+| Register | POST /auth/register |
+| Login | POST /auth/login |
+| Current User | GET /auth/me |
+| User Search | GET /users/search |
+| User Profile | GET /users/:username |
+| Feed | GET /posts/feed |
+| User Posts | GET /posts/user/:userId |
+| Create Post | POST /posts |
+| Like Post | POST /posts/:postId/like |
+| Comments | /comments |
+
+Protected endpoints require a valid JWT token.
+
 ## Database
 
 Connectify uses MongoDB Atlas to store user accounts, posts, comments, and related application data.
