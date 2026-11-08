@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | Connectify</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/config.js" defer></script>
+    <script src="js/profile.js" defer></script>
+</head>
+
+<body class="dashboard-page">
+
+    <header class="navbar">
+
+        <a href="index.html" class="logo">Connectify</a>
+
+        <div class="nav-actions">
+
+            <a href="index.html">Home</a>
+
+            <button id="logout-btn" class="logout-btn">
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+    <main class="profile-container">
+
+        <section class="profile-card">
+
+            <div class="profile-avatar-section">
+
+                <img
+                    src="https://placehold.co/120x120?text=User"
+                    id="profile-avatar"
+                    class="profile-avatar"
+                    alt="Profile picture"
+                >
+
+            </div>
+
+            <h2 id="profile-name">Loading...</h2>
+
+            <p id="profile-username"></p>
+
+            <p id="profile-bio"></p>
+
+            <div class="profile-stats">
+
+                <div>
+                    <strong id="followers-count">0</strong>
+                    <span>Followers</span>
+                </div>
+
+                <div>
+                    <strong id="following-count">0</strong>
+                    <span>Following</span>
+                </div>
+
+            </div>
+
+            <div class="profile-actions">
+
+                <a
+                    href="add-post.html"
+                    id="add-post-btn"
+                    class="primary-btn hidden"
+                >
+                    + Add Post
+                </a>
+
+                <button id="follow-btn" class="primary-btn hidden">
+                    Follow
+                </button>
+
+                <button id="edit-profile-btn" class="secondary-btn hidden">
+                    Edit Profile
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- PROFILE EDIT FORM -->
+
+        <section id="profile-edit-section" class="profile-edit-card hidden">
+
+            <h2>Edit Profile</h2>
+
+            <form id="profile-edit-form">
+
+                <div class="form-group">
+
+                    <label>Name</label>
+
+                    <input
+                        type="text"
+                        id="edit-name"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Bio</label>
+
+                    <textarea
+                        id="edit-bio"
+                        rows="4"
+                        maxlength="500"
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Profile Image</label>
+
+                    <input
+                        type="file"
+                        id="edit-avatar"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+                </div>
+
+                <button type="submit" class="primary-btn">
+                    Save Profile
+                </button>
+
+                <button
+                    type="button"
+                    id="cancel-profile-edit"
+                    class="secondary-btn"
+                >
+                    Cancel
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- USER POSTS -->
+
+        <section class="profile-posts-section">
+
+            <h2>Posts</h2>
+
+            <div id="profile-posts">
+
+                <p class="loading-message">Loading posts...</p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="toast-container"></div>
+
+</body>
+</html>

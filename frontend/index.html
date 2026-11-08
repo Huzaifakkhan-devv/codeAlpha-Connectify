@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectify | Feed</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/config.js" defer></script>
+    <script src="js/app.js" defer></script>
+</head>
+
+<body class="dashboard-page">
+
+    <header class="navbar">
+        <a href="index.html" class="logo">Connectify</a>
+
+        <div class="nav-search">
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search people..."
+            >
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <div class="nav-actions">
+            <a href="index.html">Home</a>
+
+            <a href="profile.html?me=true" id="my-profile-link">
+                My Profile
+            </a>
+
+            <button id="logout-btn" class="logout-btn">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="feed-section">
+
+            <div class="feed-heading">
+                <h2>Latest Posts</h2>
+
+                <button id="refresh-feed" class="secondary-btn">
+                    Refresh
+                </button>
+            </div>
+
+            <div id="feed-container">
+                <p class="loading-message">Loading posts...</p>
+            </div>
+
+            <div class="pagination">
+                <button id="previous-page" class="secondary-btn">
+                    Previous
+                </button>
+
+                <span id="page-number">Page 1</span>
+
+                <button id="next-page" class="secondary-btn">
+                    Next
+                </button>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- EDIT POST MODAL -->
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+
+            <button id="close-edit-modal" class="modal-close">
+                ×
+            </button>
+
+            <h2>Edit Post</h2>
+
+            <textarea id="edit-post-content" rows="5"></textarea>
+
+            <button id="save-edit-post" class="primary-btn">
+                Save Changes
+            </button>
+
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Post | Connectify</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/config.js" defer></script>
+    <script src="js/add-post.js" defer></script>
+</head>
+
+<body class="dashboard-page">
+
+    <header class="navbar">
+
+        <a href="index.html" class="logo">Connectify</a>
+
+        <div class="nav-actions">
+
+            <a href="index.html">Home</a>
+
+            <a href="profile.html?me=true">My Profile</a>
+
+            <button id="logout-btn" class="logout-btn">
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+    <main class="profile-container">
+
+        <section class="profile-edit-card">
+
+            <h2>Create New Post</h2>
+
+            <form id="create-post-form">
+
+                <div class="form-group">
+
+                    <label for="post-content">What's on your mind?</label>
+
+                    <textarea
+                        id="post-content"
+                        placeholder="Write something..."
+                        rows="6"
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="post-image">Add Image (Optional)</label>
+
+                    <input
+                        type="file"
+                        id="post-image"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+                    <p id="post-image-name"></p>
+
+                </div>
+
+                <button
+                    type="submit"
+                    id="publish-post-btn"
+                    class="primary-btn"
+                >
+                    Publish Post
+                </button>
+
+                <a
+                    href="profile.html?me=true"
+                    class="secondary-btn"
+                    style="display: inline-block; text-decoration: none; text-align: center;"
+                >
+                    Cancel
+                </a>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <div id="toast-container"></div>
+
+</body>
+</html>
