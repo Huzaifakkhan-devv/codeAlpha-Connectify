@@ -1,23 +1,34 @@
+
+// ========================================
 // CONNECTIFY PROFILE
+// ========================================
 
 if (requireAuth()) {
 
     let currentUser = null;
     let profileUser = null;
     let profileUserId = null;
+    let isMyProfile = false;
+    let isFollowing = false;
 
     const params = new URLSearchParams(window.location.search);
-
-    const isMyProfile = params.get("me") === "true";
-    const username = params.get("username");
-
-    // GET USER ID
+    const requestedMyProfile = params.get("me") === "true";
+    const requestedUsername = params.get("username");
 
     function getUserId(user) {
         return user?._id || user?.id || null;
     }
 
-    // INITIALIZE
+    function sameUsername(first, second) {
+        if (!first || !second) return false;
+
+        return String(first).trim().toLowerCase() ===
+               String(second).trim().toLowerCase();
+    }
+
+    // ========================================
+    // INITIALIZE PROFILE
+    // ========================================
 
     document.addEventListener("DOMContentLoaded", async () => {
 
@@ -26,20 +37,31 @@ if (requireAuth()) {
             const meData = await apiRequest("/auth/me");
 
             currentUser = meData.user;
-
             saveCurrentUser(currentUser);
 
-            if (isMyProfile) {
+            if (requestedMyProfile) {
 
                 profileUser = currentUser;
 
-            } else if (username) {
+            } else if (requestedUsername) {
 
-                const profileData = await apiRequest(
-                    `/users/${encodeURIComponent(username)}`
-                );
+                // Check username BEFORE fetching another profile
+                if (sameUsername(
+                    requestedUsername,
+                    currentUser.username
+                )) {
 
-                profileUser = profileData.user;
+                    profileUser = currentUser;
+
+                } else {
+
+                    const profileData = await apiRequest(
+                        `/users/${encodeURIComponent(requestedUsername)}`
+                    );
+
+                    profileUser = profileData.user;
+
+                }
 
             } else {
 
@@ -48,11 +70,22 @@ if (requireAuth()) {
 
             }
 
+            const currentUserId = getUserId(currentUser);
             profileUserId = getUserId(profileUser);
 
-            if (!profileUserId) {
-                throw new Error("Profile user ID not found.");
-            }
+            // Identify own profile using ID OR username
+            isMyProfile =
+                (
+                    currentUserId &&
+                    profileUserId &&
+                    String(currentUserId) === String(profileUserId)
+                ) ||
+                sameUsername(
+                    currentUser.username,
+                    profileUser.username
+                );
+
+            isFollowing = Boolean(profileUser.isFollowing);
 
             renderProfile();
 
@@ -66,7 +99,9 @@ if (requireAuth()) {
 
     });
 
+    // ========================================
     // RENDER PROFILE
+    // ========================================
 
     function renderProfile() {
 
@@ -83,53 +118,59 @@ if (requireAuth()) {
             profileUser.bio || "No bio added yet.";
 
         document.getElementById("followers-count").textContent =
-            profileUser.followersCount ?? profileUser.followers?.length ?? 0;
+            profileUser.followersCount ?? 0;
 
         document.getElementById("following-count").textContent =
-            profileUser.followingCount ?? profileUser.following?.length ?? 0;
+            profileUser.followingCount ?? 0;
+
+        const editButton =
+            document.getElementById("edit-profile-btn");
+
+        const addPostButton =
+            document.getElementById("add-post-btn");
+
+        const followButton =
+            document.getElementById("follow-btn");
 
         if (isMyProfile) {
 
-            document.getElementById("edit-profile-btn")
-                .classList.remove("hidden");
-
-            document.getElementById("add-post-btn")
-                .classList.remove("hidden");
+            editButton.classList.remove("hidden");
+            addPostButton.classList.remove("hidden");
+            followButton.classList.add("hidden");
 
         } else {
 
-            document.getElementById("follow-btn")
-                .classList.remove("hidden");
+            editButton.classList.add("hidden");
+            addPostButton.classList.add("hidden");
+            followButton.classList.remove("hidden");
 
-            const following = (profileUser.followers || []).some(follower => {
+            followButton.textContent =
+                isFollowing ? "Unfollow" : "Follow";
 
-                const followerId = typeof follower === "object"
-                    ? getUserId(follower)
-                    : follower;
-
-                return String(followerId) === String(getUserId(currentUser));
-
-            });
-
-            const button = document.getElementById("follow-btn");
-
-            button.textContent = following ? "Unfollow" : "Follow";
-
-            button.dataset.following = following ? "true" : "false";
+            followButton.dataset.following =
+                isFollowing ? "true" : "false";
 
         }
 
     }
 
+    // ========================================
     // LOAD PROFILE POSTS
+    // ========================================
 
     async function loadProfilePosts() {
 
-        const container = document.getElementById("profile-posts");
+        const container =
+            document.getElementById("profile-posts");
 
         container.innerHTML = "Loading posts...";
 
         try {
+
+            if (!profileUserId) {
+                container.innerHTML = "Unable to load posts.";
+                return;
+            }
 
             const data = await apiRequest(
                 `/posts/user/${profileUserId}`
@@ -187,47 +228,56 @@ if (requireAuth()) {
 
     }
 
+    // ========================================
     // FOLLOW / UNFOLLOW
+    // ========================================
 
     document.getElementById("follow-btn")
-        .addEventListener("click", async event => {
+        .addEventListener("click", async () => {
 
-            const button = event.target;
+            const button =
+                document.getElementById("follow-btn");
 
-            const following = button.dataset.following === "true";
+            if (!profileUserId || !currentUser || isMyProfile) {
+                return;
+            }
 
             button.disabled = true;
 
             try {
 
-                if (following) {
+                const method = isFollowing ? "DELETE" : "POST";
 
-                    await apiRequest(`/users/${profileUserId}/follow`, {
-                        method: "DELETE"
-                    });
+                const data = await apiRequest(
+                    `/users/${profileUserId}/follow`,
+                    { method }
+                );
 
-                } else {
+                isFollowing = !isFollowing;
+                profileUser.isFollowing = isFollowing;
 
-                    await apiRequest(`/users/${profileUserId}/follow`, {
-                        method: "POST"
-                    });
+                button.textContent =
+                    isFollowing ? "Unfollow" : "Follow";
+
+                button.dataset.following =
+                    isFollowing ? "true" : "false";
+
+                if (typeof profileUser.followersCount === "number") {
+
+                    profileUser.followersCount +=
+                        isFollowing ? 1 : -1;
+
+                    profileUser.followersCount =
+                        Math.max(0, profileUser.followersCount);
+
+                    document.getElementById("followers-count")
+                        .textContent = profileUser.followersCount;
 
                 }
 
                 showMessage(
-                    following
-                        ? "Unfollowed successfully!"
-                        : "Following successfully!"
+                    data.message || "Follow status updated."
                 );
-
-                const data = await apiRequest(
-                    `/users/${encodeURIComponent(profileUser.username)}`
-                );
-
-                profileUser = data.user;
-                profileUserId = getUserId(profileUser);
-
-                renderProfile();
 
             } catch (error) {
 
@@ -241,10 +291,14 @@ if (requireAuth()) {
 
         });
 
+    // ========================================
     // OPEN PROFILE EDIT
+    // ========================================
 
     document.getElementById("edit-profile-btn")
         .addEventListener("click", () => {
+
+            if (!isMyProfile) return;
 
             document.getElementById("profile-edit-section")
                 .classList.remove("hidden");
@@ -257,7 +311,9 @@ if (requireAuth()) {
 
         });
 
+    // ========================================
     // CANCEL PROFILE EDIT
+    // ========================================
 
     document.getElementById("cancel-profile-edit")
         .addEventListener("click", () => {
@@ -267,34 +323,37 @@ if (requireAuth()) {
 
         });
 
+    // ========================================
     // UPDATE PROFILE
+    // ========================================
 
     document.getElementById("profile-edit-form")
         .addEventListener("submit", async event => {
 
             event.preventDefault();
 
-            const name = document.getElementById("edit-name")
-                .value.trim();
+            if (!isMyProfile) return;
 
-            const bio = document.getElementById("edit-bio")
-                .value.trim();
+            const name =
+                document.getElementById("edit-name").value.trim();
 
-            const avatar = document.getElementById("edit-avatar")
-                .files[0];
+            const bio =
+                document.getElementById("edit-bio").value.trim();
+
+            const avatar =
+                document.getElementById("edit-avatar").files[0];
 
             if (!name) {
-
                 showMessage("Name is required.", "error");
                 return;
-
             }
 
             if (avatar && avatar.size > 5 * 1024 * 1024) {
-
-                showMessage("Image must be smaller than 5MB.", "error");
+                showMessage(
+                    "Image must be smaller than 5MB.",
+                    "error"
+                );
                 return;
-
             }
 
             const formData = new FormData();
@@ -314,9 +373,12 @@ if (requireAuth()) {
                 });
 
                 profileUser = data.user;
-                profileUserId = getUserId(profileUser);
+                currentUser = data.user;
 
-                saveCurrentUser(profileUser);
+                profileUserId = getUserId(profileUser);
+                isMyProfile = true;
+
+                saveCurrentUser(currentUser);
 
                 renderProfile();
 
@@ -333,12 +395,14 @@ if (requireAuth()) {
 
         });
 
-    //  LOGOUT
+    // ========================================
+    // LOGOUT
+    // ========================================
+
     document.getElementById("logout-btn")
         .addEventListener("click", () => {
 
             removeToken();
-
             window.location.href = "login.html";
 
         });
